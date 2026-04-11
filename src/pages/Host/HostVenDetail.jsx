@@ -1,18 +1,38 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link, Outlet, NavLink } from 'react-router-dom'
+import { getHostVan } from '../../api/api'
 
 export default function HostVanDetail() {
     const { id } = useParams()
     const [currentVan, setCurrentVan] = useState(null)
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState(null)
 
     useEffect(() => {
-        fetch(`/api/host/vans/${id}`)
-            .then(res => res.json())
-            .then(data => setCurrentVan(data.vans))
+        async function loadVan() {
+            setLoading(true)
+            try {
+                const data = await getHostVan(id)
+                setCurrentVan(data)
+            } catch (err) {
+                setError(err)
+            } finally {
+                setLoading(false)
+            }
+        }
+        loadVan()
     }, [id])
-    
-    if (!currentVan) {
+
+    if (loading) {
         return <h1>Loading...</h1>
+    }
+
+    if (error) {
+        return <h1>There was an error loading this van. Please try again later.</h1>
+    }
+
+    if (!currentVan) {
+        return null
     }
 
       const activeStyles = {

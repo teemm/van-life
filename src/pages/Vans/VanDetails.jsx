@@ -1,18 +1,48 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, Link, useLocation } from 'react-router-dom'
+import { getVan } from '../../api/api'
+
 export default function VanDetail() {
     const [van, setVan] = useState(null)
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState(null)
     const { id } = useParams()
-    
+    const location = useLocation()
+
     useEffect(() => {
-        fetch(`/api/vans/${id}`)
-            .then(res => res.json())
-            .then(data => setVan(data.vans))
+        async function loadVan() {
+            setLoading(true)
+            try {
+                const data = await getVan(id)
+                setVan(data)
+            } catch (err) {
+                setError(err)
+            } finally {
+                setLoading(false)
+            }
+        }
+        loadVan()
     }, [id])
+
+    const search = location.state?.search || ""
+    const type = location.state?.type || "all"
+
+    if (loading) {
+        return <h1>Loading...</h1>
+    }
+
+    if (error) {
+        return <h1>There was an error loading this van. Please try again later.</h1>
+    }
 
     return (
         <div className="van-detail-container">
-            {van ? (
+             <Link
+                to={`..${search}`}
+                relative="path"
+                className="back-button"
+            >&larr; <span>Back to {type} vans</span></Link>
+            {van && (
                 <div className="van-detail">
                     <img src={van.imageUrl} />
                     <i className={`van-type ${van.type} selected`}>{van.type}</i>
@@ -21,7 +51,7 @@ export default function VanDetail() {
                     <p>{van.description}</p>
                     <button className="link-button">Rent this van</button>
                 </div>
-            ) : <h2>Loading...</h2>}
+            )}
         </div>
     )
 }

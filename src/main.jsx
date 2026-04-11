@@ -18,12 +18,17 @@ import HostVanDetail from './pages/Host/HostVenDetail'
 import HostVanPricing from './pages/Host/HostVenPricing'
 import HostVanPhotos from './pages/Host/HostVenPhotos'
 import HostVanInfo from './pages/Host/HostVanInfo'
+import NotFound from './pages/NotFound'
+import Login from './pages/Login'
+import AuthRequired from './components/AuthRequred'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
+          <Route path="*" element={<NotFound />} />
+          <Route path='login' element={<Login />} />
           <Route index element={<Home />} />
           <Route path="about" element={<About />} />
 
@@ -32,16 +37,18 @@ createRoot(document.getElementById('root')).render(
             <Route path=":id" element={<VanDetail />} />
           </Route>
 
-          <Route path="host" element={<HostLayout />} >
-            <Route index element={<Dashboard />} />
-            <Route path="income" element={<Income />} />
-            <Route path="vans" element={<HostVans />} />
-            <Route path="vans/:id" element={<HostVanDetail />} > 
-              <Route index element={<HostVanInfo />} />
-              <Route path="pricing" element={<HostVanPricing />} />
-              <Route path="photos" element={<HostVanPhotos />} />
+          <Route element={<AuthRequired />} >
+            <Route path="host" element={<HostLayout />} >
+              <Route index element={<Dashboard />} />
+              <Route path="income" element={<Income />} />
+              <Route path="vans" element={<HostVans />} />
+              <Route path="vans/:id" element={<HostVanDetail />} > 
+                <Route index element={<HostVanInfo />} />
+                <Route path="pricing" element={<HostVanPricing />} />
+                <Route path="photos" element={<HostVanPhotos />} />
+              </Route>
+              <Route path="reviews" element={<Review />} />
             </Route>
-            <Route path="reviews" element={<Review />} />
           </Route>
         </Route>
       </Routes>
